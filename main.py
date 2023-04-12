@@ -19,6 +19,7 @@
 # cursor.close()
 # connection.close()
 
+
 def check_balance():
     #using info find balance and display
     print("Your balance is: $-balance-")
@@ -41,7 +42,6 @@ def withdraw():
     # deposit choice function (again from deposit money - reuse code)
 
 def create_account():
-    birth_day == 0
     pin_num == 0
     print("Create A New Account")
     name = input("Name: ")
@@ -66,31 +66,33 @@ print("""
 """)
 account_num = input("Account Number: ")
 pin = input("PIN: ")
-menu_choice = input("""
-1) Menu:\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit
-""")
-if menu_choice.capitalize() == "Create Account":
-    create_account()
-elif menu_choice.capitalize() == "Delete Account":
-    delete_account()
-elif menu_choice.capitalize() == "Log In":
-    print("Log In")
-    # using account number find name and display
-    print("Welcome -name-!")
-    login_choice = input("\n1) Menu:\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n")
-    if login_choice.capitalize() == "Check Balance":
-        check_balance()
-    elif login_choice.capitalize() == "Deposit Money":
-        deposit()
-    elif login_choice.capitalize() == "Withdraw":
-        withdraw()
-    elif login_choice.capitalize() == "Edit Account":
-        modify_account()
-    elif login_choice.capitalize() == "Exit":
-        print("Exit. Bye.")
+menu_choice = 0
+while menu_choice < 1 or  menu_choice > 5:
+    menu_choice = int(input("""\n1) Menu:\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (action or the number): """))
+    if menu_choice == 1:
+        menu_choice == 0
+    elif menu_choice == 2:
+        create_account()
+    elif menu_choice == 3:
+        delete_account()
+    elif menu_choice == 4:
+        print("Log In")
+        # using account number find name and display
+        print("Welcome -name-!")
+        login_choice = int(input("""\n1) Menu:\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (action or the number): """))
+        if login_choice == 2:
+            check_balance()
+        elif login_choice == 3:
+            deposit()
+        elif login_choice == 4:
+            withdraw()
+        elif login_choice == 5:
+            modify_account()
+        elif login_choice == 5:
+            print("Exit. Bye.")
+        else:
+            print("Please choose a valid option")
+    elif menu_choice == 5:
+        print("Exit. Goodbye! ")
     else:
-        print("Please choose a valid option")
-elif menu_choice.capitalize() == 'Exit':
-    print("Exit. Goodbye! ")
-else:
-    print("Please choose an option from the menu")
+        print("Please choose an option from the menu")
