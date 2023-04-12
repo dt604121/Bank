@@ -60,15 +60,15 @@ def modify_account():
 
 
 print("""
-== == == == == == == == == == == == == == == == == == == == ==\n\n
-            Hello There. Welcome to Easy Bank!\n\n
+== == == == == == == == == == == == == == == == == == == == ==\n
+            Hello There. Welcome to Easy Bank!\n
 == == == == == == == == == == == == == == == == == == == == ==
 """)
-account_num = input("Account Number: ")
-pin = input("PIN: ")
+account_num = int(input("Account Number: "))
+pin = int(input("PIN: "))
 menu_choice = 0
 while menu_choice < 1 or  menu_choice > 5:
-    menu_choice = int(input("""\n1) Menu:\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (action or the number): """))
+    menu_choice = int(input("""\n~ Home ~\n1) Menu\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (action or the number): """))
     if menu_choice == 1:
         menu_choice == 0
     elif menu_choice == 2:
@@ -79,7 +79,7 @@ while menu_choice < 1 or  menu_choice > 5:
         print("Log In")
         # using account number find name and display
         print("Welcome -name-!")
-        login_choice = int(input("""\n1) Menu:\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (action or the number): """))
+        login_choice = int(input("""\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (action or the number): """))
         if login_choice == 2:
             check_balance()
         elif login_choice == 3:
@@ -89,10 +89,10 @@ while menu_choice < 1 or  menu_choice > 5:
         elif login_choice == 5:
             modify_account()
         elif login_choice == 5:
-            print("Exit. Bye.")
+            print("\nExit. Bye.")
         else:
-            print("Please choose a valid option")
+            print("Please choose a valid option of 1-6.")
     elif menu_choice == 5:
-        print("Exit. Goodbye! ")
+        print("\nExit. Goodbye! ")
     else:
-        print("Please choose an option from the menu")
+        print("Please choose an option from the menu 1-5.")
