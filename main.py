@@ -21,8 +21,8 @@
 balance = 0
 menu_choice = 0
 name = None
-pin_num = None
-birth_day = None
+pin_num = 0
+birth_day = 0
 withdraw_amount = 0
 deposit_amount = 0
 deposit_difference = 0
@@ -33,29 +33,35 @@ withdraw_choice = 0
 def check_balance(balance):
     #use mysql info to find and pull balance and display
     print(f"Your balance is: ${balance}")
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
 def deposit(balance, deposit_amount, deposit_difference, deposit_choice):
     money_left = 0
-    while deposit_choice != 1 or deposit_choice != 2:
-        deposit_choice = input("1) Deposit\n2) Cancel\n")
-        if deposit_choice.capitalize() == "Deposit":
-            deposit_amount = input("How much money would you like to deposit? ")
-            deposit_difference == balance - deposit_amount
-            deposit_difference = money_left
-            print(f"You deposited ${deposit_amount}. You now have ${money_left} in your account.")
-        elif deposit_choice.capitalize() == "Cancel":
+    balance = int(balance)
+    while deposit_choice < 1 or deposit_choice > 2:
+        deposit_choice = int(
+            input("1) Deposit\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
+        if deposit_choice == 1:
+            deposit_amount = input(
+                "How much money would you like to withdraw? ")
+            deposit_difference = balance - int(deposit_amount)
+            money_left = deposit_difference
+            print(
+                f"You deposited ${deposit_amount}. You now have ${money_left} in your account.")
+        elif deposit_choice == 2:
             print("\nOk, canceled")
-        else: 
+        else:
             print("Please choose either option 1 or 2.")
-        display_menu(menu_choice)
 
 def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice):
     money_left = 0
-    while withdraw_choice != 1 or withdraw_choice != 2:
-        withdraw_choice = input("1) Withdraw\n2) Cancel\n")
+    balance = int(balance)
+    withdraw_amount = int(withdraw_amount)
+    while withdraw_choice < 1 or withdraw_choice > 2:
+        withdraw_choice = int(input("1) Withdraw\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
         if withdraw_choice == 1:
             withdraw_amount = input("How much money would you like to withdraw? ")
-            withdraw_difference == withdraw_amount - balance
+            withdraw_difference = balance - int(withdraw_amount)
             money_left = withdraw_difference
             print(
                 f"You deposited ${withdraw_amount}. You now have ${money_left} in your account.")
@@ -63,7 +69,6 @@ def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice):
             print("\nOk, canceled")
         else:
             print("Please choose either option 1 or 2.")
-        display_menu(menu_choice)
 
 def create_account(name, birth_day, pin_num):
     print("Create A New Account")
@@ -71,15 +76,24 @@ def create_account(name, birth_day, pin_num):
     birth_day = input("Date of Birth: ")
     pin_num = int(input("PIN: "))
     print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}")
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
 def delete_account():
     # delete account
     input("Which account would you like to delete? ")
     print("Deleted")
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
     
 def modify_account():
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
     print("Edit access")
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+
+
+def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice):
+    menu_choice = 0
+    display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
+                 deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice):
     name = input("Name: ")
@@ -102,17 +116,21 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
             elif login_choice == 2:
                 check_balance(balance)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
+                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
             elif login_choice == 3:
                 deposit(balance, deposit_amount, deposit_difference, deposit_choice)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
+                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
             elif login_choice == 4:
                 withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
+                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
             elif login_choice == 5:
                 modify_account()
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
-            elif login_choice == 5:
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
+                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+            elif login_choice == 6:
                 print("\nExit. Bye.")
                 break
             else:
@@ -122,11 +140,7 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
             break
         else:
             print("Please choose an option from the menu 1-5.")
-
-
-def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice):
-    menu_choice = 0
-    display_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+            
 
 # main
 print("""
