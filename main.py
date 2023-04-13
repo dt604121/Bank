@@ -1,21 +1,18 @@
-# import mysql.connector
+import mysql.connector
 
-# connection = mysql.connector.connect(
-#     user ='root', database = 'example', password = '12345')
+connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
 
-# cursor = connection.cursor()
+cursor = connection.cursor()
 
+testQuery = ("SELECT * FROM students")
 
-# testQuery = ("SELECT * FROM students")
+cursor.execute(testQuery)
 
-# cursor.execute(testQuery)
+for item in cursor:
 
-# for item in cursor:
+    print(item)
 
-#     print(item)
-
-# cursor.close()
-# connection.close()
+cursor.close()
 
 # variables
 balance = 0
@@ -29,6 +26,7 @@ deposit_difference = 0
 withdraw_difference = 0
 deposit_choice = 0
 withdraw_choice = 0
+account_num = 0 
 
 def check_balance(balance):
     #use mysql info to find and pull balance and display
@@ -70,11 +68,15 @@ def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice):
         else:
             print("Please choose either option 1 or 2.")
 
-def create_account(name, birth_day, pin_num):
+def create_account(name, account_num, birth_day, pin_num, balance):
     print("Create A New Account")
     name = str(input("Name: "))
     birth_day = input("Date of Birth: ")
     pin_num = int(input("PIN: "))
+    mycursor = connection.cursor()
+    sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', {account_num}, {pin_num}, {birth_day}, {balance})")
+    print(sql)
+    mycursor.execute(sql)
     print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
@@ -89,7 +91,6 @@ def modify_account():
     print("Edit access")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
-
 def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice):
     menu_choice = 0
     display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
@@ -102,9 +103,9 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
             """\n~ Home ~\n1) Menu\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (number 1-5): """))
         if menu_choice == 1:
             menu_choice = 0
-            display_menu(menu_choice, name, balance, deposit_amount, deposit_difference, withdraw_amount, withdraw_difference)
+            display_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
         elif menu_choice == 2:
-            create_account(name, birth_day, pin_num)
+            create_account(name, account_num, birth_day, pin_num, balance)
         elif menu_choice == 3:
             delete_account()
         elif menu_choice == 4:
@@ -131,7 +132,7 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_difference,
                             deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
             elif login_choice == 6:
-                print("\nExit. Bye.")
+                print("\nExit log in options. Going back home :)")
                 break
             else:
                 print("Please choose a valid option of 1-6.")
@@ -151,3 +152,5 @@ print("""
 account_num = int(input("Account Number: "))
 pin = int(input("PIN: "))
 display_menu(menu_choice, name, balance, deposit_amount, deposit_difference, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+
+connection.close()
