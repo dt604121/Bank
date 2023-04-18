@@ -1,18 +1,2 @@
-import mysql.connector
-
-# connection = mysql.connector.connect(
-#     user ='root', database = 'example', password = '12345')
-
-# cursor = connection.cursor()
-
-
-# testQuery = ("SELECT * FROM students")
-
-# cursor.execute(testQuery)
-
-# for item in cursor:
-
-#     print(item)
-
-# cursor.close()
-# connection.close()
+            # log_in = (f"SELECT name * FROM bank WHERE {account_num == account_num and pin_num == pin_num}")
+            # login_cursor.execute(log_in)

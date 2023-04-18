@@ -1,6 +1,13 @@
+# Testing
+import unittest
+
+if __name__ == 'main':
+    unittest.main()
+
 import mysql.connector
 
 connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
+connection.autocommit = True
 
 cursor = connection.cursor()
 
@@ -28,13 +35,16 @@ deposit_choice = 0
 withdraw_choice = 0
 account_num = 0 
 
-def check_balance(balance):
+def check_balance(balance, account_num, pin_num):
     #use mysql info to find and pull balance and display
-    print(f"Your balance is: ${balance}")
+    balance_cursor = connection.cursor()
+    find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
+    print(find_balance)
+    balance_cursor.execute(find_balance) 
+    for balance in cursor:
+        print(f"Your balance is: ${balance}")
+    balance_cursor.close()
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
-    # balance_cursor = connection.cursor()
-    # find_balance = (f"SELECT * FROM bank WHERE {account_num == account_num and pin_num == pin_num}")
-    # balance_cursor.execute(find_balance)
 
 def deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num):
     money_now = 0
@@ -79,7 +89,7 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     pin_num = int(input("PIN: "))
     balance = int(input("Balance: "))
     mycursor = connection.cursor()
-    sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', {account_num}, {pin_num}, {birth_day}, {balance})")
+    sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
     print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}\n Balance: ${balance}")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
@@ -114,15 +124,15 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
         elif menu_choice == 4:
             # using account number find name and display
             login_cursor = connection.cursor()
-            log_in = (f"SELECT name * FROM bank WHERE {account_num == account_num and pin_num == pin_num}")
-            login_cursor.execute(log_in)
+            # log_in = (f"SELECT name * FROM bank WHERE {account_num == account_num and pin_num == pin_num}")
+            # login_cursor.execute(log_in)
             print(f"\nWelcome {name}! You are now logged in :).")
             login_choice = int(input(
                 """\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
             if login_choice == 1:
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 2:
-                check_balance(balance)
+                check_balance(balance, account_num, pin_num)
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
                             deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 3:
