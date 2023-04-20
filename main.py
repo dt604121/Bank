@@ -37,32 +37,23 @@ def check_balance(balance, account_num, pin_num):
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num):
-    deposit_curosr = connection.cursor()
-    find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
-    deposit_curosr.execute(find_balance)
-    result = deposit_curosr.fetchone()
-    if result:
-        balance = result[0]
-        return balance
-    else:
-        print("Invalid account number or PIN.")
     money_now = 0
     balance = int(balance)
+    deposit_amount = int(deposit_amount)
     while deposit_choice < 1 or deposit_choice > 2:
         deposit_choice = int(
             input("1) Deposit\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
         if deposit_choice == 1:
-            deposit_amount = input("How much money would you like to deposit? ")
+            deposit_amount = input(
+                "How much money would you like to deposit? ")
             deposit_sum = balance + int(deposit_amount)
             money_now = deposit_sum
-            money_now = f"UPDATE account SET balance = '{money_now}'"
-            print(f"Depositing into {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
+            print(
+                f"Depositing from Account: {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
         elif deposit_choice == 2:
             print("\nOk, canceled")
         else:
             print("Please choose either option 1 or 2.")
-    deposit_curosr.close()
-    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
     money_left = 0
@@ -75,7 +66,7 @@ def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, acc
             withdraw_difference = balance - int(withdraw_amount)
             money_left = withdraw_difference
             print(
-                f"Withdrawing from {account_num}. You withdrew ${withdraw_amount}. You now have ${money_left} in your account.")
+                f"Withdrawing from Account: {account_num}. You withdrew ${withdraw_amount}. You now have ${money_left} in your account.")
         elif withdraw_choice == 2:
             print("\nOk, canceled")
         else:
