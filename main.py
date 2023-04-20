@@ -27,10 +27,13 @@ def check_balance(balance, account_num, pin_num):
     #use mysql info to find and pull balance and display
     balance_cursor = connection.cursor()
     find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
-    print(find_balance)
-    balance_cursor.execute(find_balance) 
-    for balance in balance_cursor:
+    balance_cursor.execute(find_balance)
+    result = balance_cursor.fetchone()
+    if result:
+        balance = result[0]
         print(f"Your balance is: ${balance}")
+    else:
+        print("Invalid account number or PIN.")
     balance_cursor.close()
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
@@ -79,7 +82,7 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     mycursor = connection.cursor()
     sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
-    print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}\n Balance: ${balance}")
+    print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
 
 def delete_account(account_num):
@@ -110,19 +113,16 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
         elif menu_choice == 3:
             delete_account(account_num)
         elif menu_choice == 4:
-            # using account number find name and display
-            login_cursor = connection.cursor()
-            # log_in = (f"SELECT name * FROM bank WHERE {account_num == account_num and pin_num == pin_num}")
-            # login_cursor.execute(log_in)
             print(f"\nWelcome {name}! You are now logged in :).")
             login_choice = int(input(
                 """\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
             if login_choice == 1:
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 2:
+
                 check_balance(balance, account_num, pin_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
-                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                            withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 3:
                 deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num)
                 repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
@@ -133,8 +133,8 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
                             deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 5:
                 modify_account(account_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
-                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                            withdraw_amount, withdraw_difference, withdraw_choice, account_num)
             elif login_choice == 6:
                 print("\nExit log in options. Going back home :)")
                 break
@@ -154,7 +154,7 @@ print("""
 == == == == == == == == == == == == == == == == == == == == ==
 """)
 account_num = int(input("Account Number: "))
-pin = int(input("PIN: "))
+pin_num = int(input("PIN: "))
 display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 connection.close()
