@@ -86,16 +86,21 @@ def create_account(name, account_num, birth_day, pin_num, balance):
 def delete_account(account_num):
     # delete account
     delete_cursor = connection.cursor()
-    account_num = input("Which account would you like to delete? ")
-    sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
-    delete_cursor.execute(sql)
-    print(f"Account number: {account_num} deleted.")
+    delete_choice = 0
+    while delete_choice < 1 or delete_choice > 2:
+        delete_choice = int(input(
+            "Are you sure you want to delete your account?\n1) Delete Account\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
+        if delete_choice == 1:
+            sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
+            delete_cursor.execute(sql)
+            print(f"Account number: {account_num} deleted.")
+        else:
+            print("Canceled.")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
     
 def modify_account(account_num, pin_num):
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
     modify_cursor = connection.cursor()
-    account_num = int(input("Which account would you like to modify? "))
     print("\nEnter your edited information below:\n")
     new_name = str(input("Updated Name: "))
     new_pin_num = int(input("Updated PIN: "))
@@ -110,8 +115,7 @@ def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit
 
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
     while menu_choice < 1 or menu_choice > 5:
-        menu_choice = int(input(
-            """\n~ Home ~\n1) Menu\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (number 1-5): """))
+        menu_choice = int(input("""\n~ Home ~\n1) Menu\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (number 1-5): """))
         if menu_choice == 1:
             menu_choice = 0
             display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
