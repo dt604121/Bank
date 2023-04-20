@@ -24,7 +24,6 @@ withdraw_choice = 0
 account_num = 0 
 
 def check_balance(balance, account_num, pin_num):
-    #use mysql info to find and pull balance and display
     balance_cursor = connection.cursor()
     find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
     balance_cursor.execute(find_balance)
@@ -35,26 +34,35 @@ def check_balance(balance, account_num, pin_num):
     else:
         print("Invalid account number or PIN.")
     balance_cursor.close()
-    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num):
+    deposit_curosr = connection.cursor()
+    find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
+    deposit_curosr.execute(find_balance)
+    result = deposit_curosr.fetchone()
+    if result:
+        balance = result[0]
+        return balance
+    else:
+        print("Invalid account number or PIN.")
     money_now = 0
     balance = int(balance)
     while deposit_choice < 1 or deposit_choice > 2:
         deposit_choice = int(
             input("1) Deposit\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
         if deposit_choice == 1:
-            deposit_amount = input(
-                "How much money would you like to deposit? ")
+            deposit_amount = input("How much money would you like to deposit? ")
             deposit_sum = balance + int(deposit_amount)
             money_now = deposit_sum
-            print(
-                f"Depositing into {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
+            money_now = f"UPDATE account SET balance = '{money_now}'"
+            print(f"Depositing into {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
         elif deposit_choice == 2:
             print("\nOk, canceled")
         else:
             print("Please choose either option 1 or 2.")
-
+    deposit_curosr.close()
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
     money_left = 0
@@ -76,6 +84,7 @@ def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, acc
 def create_account(name, account_num, birth_day, pin_num, balance):
     print("Create A New Account")
     name = str(input("Name: "))
+    account_num = int(input("Account Number: "))
     birth_day = input("Date of Birth: ")
     pin_num = int(input("PIN: "))
     balance = int(input("Balance: "))
@@ -83,23 +92,22 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
     print(f"New user created. Welcome, {name.capitalize()}.\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
-    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def delete_account(account_num):
     # delete account
     input("Which account would you like to delete? ")
     print(f"Account number {account_num} deleted.")
-    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
     
 def modify_account(account_num):
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
     print(f"Edit account number {account_num}.")
-    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
+    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
-def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice):
+def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
     menu_choice = 0
-    display_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
-                 deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+    display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
     while menu_choice < 1 or menu_choice > 5:
@@ -113,33 +121,44 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
         elif menu_choice == 3:
             delete_account(account_num)
         elif menu_choice == 4:
-            print(f"\nWelcome {name}! You are now logged in :).")
-            login_choice = int(input(
-                """\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
-            if login_choice == 1:
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-            elif login_choice == 2:
-
-                check_balance(balance, account_num, pin_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                            withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-            elif login_choice == 3:
-                deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
-                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-            elif login_choice == 4:
-                withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum,
-                            deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-            elif login_choice == 5:
-                modify_account(account_num)
-                repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                            withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-            elif login_choice == 6:
-                print("\nExit log in options. Going back home :)")
-                break
+            login_cursor = connection.cursor()
+            find_name = f"SELECT name FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
+            login_cursor.execute(find_name)
+            result = login_cursor.fetchone()
+            if result:
+                name = result[0]
+                print(f"\nWelcome {name.capitalize()}! You are now logged in :).")
+                login_choice = int(input(
+                    """\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
+                if login_choice == 1:
+                    login_cursor.close()
+                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                elif login_choice == 2:
+                    check_balance(balance, account_num, pin_num)
+                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                elif login_choice == 3:
+                    deposit(balance, deposit_amount, deposit_sum,
+                            deposit_choice, account_num)
+                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                elif login_choice == 4:
+                    withdraw(balance, withdraw_amount, withdraw_difference,
+                            withdraw_choice, account_num)
+                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                elif login_choice == 5:
+                    modify_account(account_num)
+                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+                elif login_choice == 6:
+                    print("\nExit log in options. Going back home :)")
+                    break
+                else:
+                    print("Please choose a valid option of 1-6.")
             else:
-                print("Please choose a valid option of 1-6.")
+                print("Invalid account number or PIN.")
         elif menu_choice == 5:
             print("\nExit. Goodbye!\n")
             break
