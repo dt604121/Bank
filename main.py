@@ -44,12 +44,10 @@ def deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num):
         deposit_choice = int(
             input("1) Deposit\n2) Cancel\n\nPlease choose an option (number 1 or 2): "))
         if deposit_choice == 1:
-            deposit_amount = input(
-                "How much money would you like to deposit? ")
+            deposit_amount = input("How much money would you like to deposit? ")
             deposit_sum = balance + int(deposit_amount)
             money_now = deposit_sum
-            print(
-                f"Depositing from Account: {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
+            print(f"Depositing from Account: {account_num}. You deposited ${deposit_amount}. You now have ${money_now} in your account.")
         elif deposit_choice == 2:
             print("\nOk, canceled")
         else:
@@ -87,13 +85,23 @@ def create_account(name, account_num, birth_day, pin_num, balance):
 
 def delete_account(account_num):
     # delete account
-    input("Which account would you like to delete? ")
-    print(f"Account number {account_num} deleted.")
+    delete_cursor = connection.cursor()
+    account_num = input("Which account would you like to delete? ")
+    sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
+    delete_cursor.execute(sql)
+    print(f"Account number: {account_num} deleted.")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
     
-def modify_account(account_num):
+def modify_account(account_num, pin_num):
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
-    print(f"Edit account number {account_num}.")
+    modify_cursor = connection.cursor()
+    account_num = int(input("Which account would you like to modify? "))
+    print("\nEnter your edited information below:\n")
+    new_name = str(input("Updated Name: "))
+    new_pin_num = int(input("Updated PIN: "))
+    sql = f"UPDATE bank SET name = '{new_name}', pin = '{new_pin_num}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
+    modify_cursor.execute(sql)
+    print(f"\nAccount number: {account_num} has been modified. Your updated name is {new_name.capitalize()}, and your updated PIN is now {new_pin_num}.")
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
 def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
@@ -130,17 +138,15 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
                     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
                                 withdraw_amount, withdraw_difference, withdraw_choice, account_num)
                 elif login_choice == 3:
-                    deposit(balance, deposit_amount, deposit_sum,
-                            deposit_choice, account_num)
+                    deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num)
                     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
                                 withdraw_amount, withdraw_difference, withdraw_choice, account_num)
                 elif login_choice == 4:
-                    withdraw(balance, withdraw_amount, withdraw_difference,
-                            withdraw_choice, account_num)
+                    withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
                     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
                                 withdraw_amount, withdraw_difference, withdraw_choice, account_num)
                 elif login_choice == 5:
-                    modify_account(account_num)
+                    modify_account(account_num, pin_num)
                     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
                                 withdraw_amount, withdraw_difference, withdraw_choice, account_num)
                 elif login_choice == 6:
