@@ -9,18 +9,6 @@ import mysql.connector
 connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
 connection.autocommit = True
 
-cursor = connection.cursor()
-
-testQuery = ("SELECT * FROM students")
-
-cursor.execute(testQuery)
-
-for item in cursor:
-
-    print(item)
-
-cursor.close()
-
 # variables
 balance = 0
 menu_choice = 0
@@ -41,7 +29,7 @@ def check_balance(balance, account_num, pin_num):
     find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
     print(find_balance)
     balance_cursor.execute(find_balance) 
-    for balance in cursor:
+    for balance in balance_cursor:
         print(f"Your balance is: ${balance}")
     balance_cursor.close()
     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice)
