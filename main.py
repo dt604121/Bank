@@ -40,7 +40,7 @@ deposit_sum = 0
 withdraw_difference = 0
 deposit_choice = 0
 withdraw_choice = 0
-account_num = 0 
+account_num = 0
 
 def check_balance(balance, account_num, pin_num):
     balance_cursor = connection.cursor()
