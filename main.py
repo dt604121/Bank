@@ -71,7 +71,7 @@ def withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, acc
 
 def create_account(name, account_num, birth_day, pin_num, balance):
     print("\nWelcome! Create a new account by entering some basic information below:\n")
-    name = str(input("Name: "))
+    name = str(input("First & Last Name: "))
     account_num = int(input("Account Number: "))
     birth_day = input("Date of Birth: ")
     pin_num = int(input("PIN: "))
@@ -79,7 +79,7 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     mycursor = connection.cursor()
     sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
-    print(f"\nNew user created. Welcome, {name.title()}.\nHere is your account information:\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
+    print(f"\nNew user created. Welcome, {name.title()}.\nHere is your account information:\nAccount Number: {account_num}\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
 
 def delete_account(account_num):
     # delete account
@@ -98,7 +98,7 @@ def modify_account(account_num, pin_num):
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
     modify_cursor = connection.cursor()
     print("\nEnter your edited information below:\n")
-    new_name = str(input("Updated Name: "))
+    new_name = str(input("Updated First & Last Name: "))
     new_pin_num = int(input("Updated PIN: "))
     sql = f"UPDATE bank SET name = '{new_name}', pin = '{new_pin_num}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
     modify_cursor.execute(sql)
@@ -142,8 +142,8 @@ def bank_login(account_num, pin_num, menu_choice):
                 elif login_choice == 7:
                     create_account(name, account_num, birth_day, pin_num, balance)
                 elif login_choice == 8:
-                    print("\nExit log in options. Going back home :)")
-                    menu_choice == 1
+                    print("\nExiting: See you next time :)")
+                    menu_choice = 0
                     break
                 else:
                     print("Please choose a valid option of 1-8.")
@@ -152,16 +152,19 @@ def bank_login(account_num, pin_num, menu_choice):
             log_in = False
 
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
-    while menu_choice < 1 or menu_choice > 3:
+    exit = True
+    while menu_choice < 1 or menu_choice > 3 and exit != False:
         menu_choice = int(input("\n  ~ Home Menu ~\n1) Create An Account\n2) Log In\n3) Exit\n\nPlease choose an option (number 1-3): "))
         display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
         if menu_choice == 1:
             create_account(name, account_num, birth_day, pin_num, balance)
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
         elif menu_choice == 2:
             bank_login(account_num, pin_num, menu_choice)
         elif menu_choice == 3:
+            exit = False
             print("\nExiting: Goodbye!\n")
-            menu_choice == 1
             break
         else:
             print("Please choose an option from the menu 1-3.")
