@@ -113,59 +113,63 @@ def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit
     menu_choice = 0
     display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
 
+
+def bank_login(account_num, pin_num, menu_choice):
+    login_cursor = connection.cursor()
+    find_name = f"SELECT name FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
+    login_cursor.execute(find_name)
+    result = login_cursor.fetchone()
+    if result:
+        name = result[0]
+        print(
+            f"\nWelcome {name.capitalize()}! You are now logged in :).")
+        login_choice = int(input(
+            """\n ~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
+        if login_choice == 1:
+            login_cursor.close()
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+        elif login_choice == 2:
+            check_balance(balance, account_num, pin_num)
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+        elif login_choice == 3:
+            deposit(balance, deposit_amount, deposit_sum,
+                    deposit_choice, account_num)
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+        elif login_choice == 4:
+            withdraw(balance, withdraw_amount,
+                        withdraw_difference, withdraw_choice, account_num)
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+        elif login_choice == 5:
+            modify_account(account_num, pin_num)
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
+                        withdraw_amount, withdraw_difference, withdraw_choice, account_num)
+        elif login_choice == 6:
+            print("\nExit log in options. Going back home :)")
+            menu_choice == 1
+        else:
+            print("Please choose a valid option of 1-6.")
+    else:
+        print("Invalid account number or PIN.")
+
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
-    while menu_choice < 1 or menu_choice > 5:
-        menu_choice = int(input("""\n~ Home ~\n1) Menu\n2) Create Account\n3) Delete Account\n4) Log In\n5) Exit\n\nPlease choose an option (number 1-5): """))
+    while menu_choice < 1 or menu_choice > 4:
+        menu_choice = int(input("""\n~ Home Menu ~\n1) Create Account\n2) Delete Account\n3) Log In\n4) Exit\n\nPlease choose an option (number 1-5): """))
+        display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
         if menu_choice == 1:
-            menu_choice = 0
-            display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-        elif menu_choice == 2:
             create_account(name, account_num, birth_day, pin_num, balance)
-        elif menu_choice == 3:
+        elif menu_choice == 2:
             delete_account(account_num)
+        elif menu_choice == 3:
+            bank_login(account_num, pin_num, menu_choice)
         elif menu_choice == 4:
-            login_cursor = connection.cursor()
-            find_name = f"SELECT name FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
-            login_cursor.execute(find_name)
-            result = login_cursor.fetchone()
-            if result:
-                name = result[0]
-                print(f"\nWelcome {name.capitalize()}! You are now logged in :).")
-                login_choice = int(input(
-                    """\n~ Home ~\n1) Menu\n2) Check Balance\n3) Deposit Money\n4) Withdraw\n5) Edit Account\n6) Exit\n\nPlease choose an option (number 1-6): """))
-                if login_choice == 1:
-                    login_cursor.close()
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                elif login_choice == 2:
-                    check_balance(balance, account_num, pin_num)
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                elif login_choice == 3:
-                    deposit(balance, deposit_amount, deposit_sum, deposit_choice, account_num)
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                elif login_choice == 4:
-                    withdraw(balance, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                elif login_choice == 5:
-                    modify_account(account_num, pin_num)
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice,
-                                withdraw_amount, withdraw_difference, withdraw_choice, account_num)
-                elif login_choice == 6:
-                    print("\nExit log in options. Going back home :)")
-                    break
-                else:
-                    print("Please choose a valid option of 1-6.")
-            else:
-                print("Invalid account number or PIN.")
-        elif menu_choice == 5:
-            print("\nExit. Goodbye!\n")
+            print("\nExiting: Goodbye!\n")
             break
         else:
             print("Please choose an option from the menu 1-5.")
-            
 
 # main
 print("""
