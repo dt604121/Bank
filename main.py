@@ -1,5 +1,6 @@
 # Testing
 import unittest
+import sys
 from unittest.mock import MagicMock
 import main
 
@@ -99,7 +100,7 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     mycursor.execute(sql)
     print(f"\nNew user created. Welcome, {name.title()}.\nHere is your account information:\nAccount Number: {account_num}\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
 
-def delete_account(account_num):
+def delete_account(account_num, pin_num):
     # delete account
     delete_cursor = connection.cursor()
     delete_choice = 0
@@ -141,7 +142,7 @@ def bank_login(account_num, pin_num, menu_choice):
             log_in = True
             login_choice = 0
             while login_choice >= 1 or login_choice <= 8:
-                login_choice = int(input("\n ~ Menu ~\n1) Return Home\n2) Check Account Balance\n3) Make A Deposit\n4) Make A Withdrawal\n5) Edit Account\n6) Delete An Account\n7) Create An Account\n8) Exit\n\nPlease choose an option (number 1-8): "))
+                login_choice = int(input("\n ~ Menu ~\n1) Return Home\n2) Check Account Balance\n3) Make A Deposit\n4) Make A Withdrawal\n5) Edit Account\n6) Delete Your Account\n7) Create An Account\n8) Exit\n\nPlease choose an option (number 1-8): "))
                 if login_choice == 1:
                     login_cursor.close()
                     repeat_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
@@ -156,7 +157,7 @@ def bank_login(account_num, pin_num, menu_choice):
                 elif login_choice == 5:
                     modify_account(account_num, pin_num)
                 elif login_choice == 6:
-                    delete_account(account_num)
+                    delete_account(account_num, pin_num)
                 elif login_choice == 7:
                     create_account(name, account_num, birth_day, pin_num, balance)
                 elif login_choice == 8:
@@ -170,8 +171,7 @@ def bank_login(account_num, pin_num, menu_choice):
             log_in = False
 
 def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num):
-    exit = True
-    while menu_choice < 1 or menu_choice > 3 and exit != False:
+    while menu_choice < 1 or menu_choice > 3:
         menu_choice = int(input("\n  ~ Home Menu ~\n1) Create An Account\n2) Log In\n3) Exit\n\nPlease choose an option (number 1-3): "))
         display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposit_choice, withdraw_amount, withdraw_difference, withdraw_choice, account_num)
         if menu_choice == 1:
@@ -181,11 +181,11 @@ def display_menu(menu_choice, name, balance, deposit_amount, deposit_sum, deposi
         elif menu_choice == 2:
             bank_login(account_num, pin_num, menu_choice)
         elif menu_choice == 3:
-            exit = False
             print("\nExiting: Goodbye!\n")
-            break
+            sys.exit()
         else:
             print("Please choose an option from the menu 1-3.")
+        break
 
 # main
 print("""
