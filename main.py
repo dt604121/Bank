@@ -1,8 +1,26 @@
 # Testing
 import unittest
+from unittest.mock import MagicMock
+import main
 
-if __name__ == 'main':
-    unittest.main()
+# Test Check Balance
+class TestCheckBalance(unittest.TestCase):
+    def test_check_balance(self):
+        # Create a MagicMock for the cursor
+        cursor_mock = MagicMock()
+        cursor_mock.fetchone.return_value = (1000,)
+
+        # Set the cursor to the MagicMock
+        main.cnx.cursor.return_value = cursor_mock
+
+        # Call the function you want to test
+        result = main.check_balance('01234567')
+
+        # Assert that the cursor was called with the correct query
+        cursor_mock.execute.assert_called_once_with('SELECT balance FROM accounts WHERE account_number = %s', ('01234567',))
+
+        # Assert that the result is correct
+        self.assertEqual(result, 1000)
 
 import mysql.connector
 
