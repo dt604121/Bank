@@ -47,14 +47,15 @@ def check_balance(balance, account_num, pin_num):
     result = balance_cursor.fetchone()
     if result:
         balance = result[0]
-        print(f"\nYour current balance is: ${balance}")
+        print(f"\nYour current balance is: ${balance:.2f}")
     else:
         print("Invalid account number or PIN.")
     balance_cursor.close()
 
 def deposit(balance, deposit_amount, account_num, pin_num):
     deposit_choice = 0
-    while deposit_choice < 1 or deposit_choice > 2:
+    valid_deposit = None
+    while deposit_choice < 1 or deposit_choice > 2 or valid_deposit == False:
         deposit_choice = int(input("1) Deposit\n2) Cancel\n\nPlease enter option 1 or 2: "))
         if deposit_choice == 1:
             deposit_cursor = connection.cursor()
@@ -65,21 +66,28 @@ def deposit(balance, deposit_amount, account_num, pin_num):
             if result is None:
                 print("Invalid account number or pin.")
                 return
-            deposit_amount = int(input("\nHow much money would you like to deposit from your account? "))
-            current_balance = int(result[0])
-            new_balance = current_balance + deposit_amount
-            deposit_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
-            connection.commit()
-            print(f"Your deposit of ${deposit_amount} was successful. The new balance is: ${new_balance}")
-            deposit_cursor.close()
+            deposit_amount = float(input("\nHow much money would you like to deposit into your account? "))
+            if deposit_amount != 0:
+                current_balance = int(result[0])
+                new_balance = current_balance + deposit_amount
+                deposit_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
+                connection.commit()
+                print(f"Your deposit of ${deposit_amount:.2f} was successful. The new balance is: ${new_balance:.2f}")
+                deposit_cursor.close()
+                valid_deposit = True
+            else: 
+                print(f"\nInvalid Amount: Please choose an amount greater than $0.")
+                valid_deposit = False
         elif deposit_choice == 2:
             print("\nDeposit canceled.")
+            break
         else:
-            print("Invalid choice please choose either 1 or 2.")
+            print("\nInvalid Choice: please choose either 1 or 2.")
 
 def withdraw(balance, withdraw_amount, withdraw_choice, account_num, pin_num):
     withdraw_choice = 0
-    while withdraw_choice < 1 or withdraw_choice > 2:
+    valid_withdrawal = False
+    while withdraw_choice < 1 or withdraw_choice > 2 or valid_withdrawal == False:
         withdraw_choice = int(input("1) Withdraw\n2) Cancel\n\nPlease enter option 1 or 2: "))
         if withdraw_choice == 1:
             withdraw_cursor = connection.cursor()
@@ -90,17 +98,26 @@ def withdraw(balance, withdraw_amount, withdraw_choice, account_num, pin_num):
             if result is None:
                 print("Invalid account number or pin.")
                 return
-            withdraw_amount = int(input("\nHow much money would you like to withdraw from your account? "))
+            withdraw_amount = float(input("\nHow much money would you like to withdraw from your account? "))
             current_balance = int(result[0])
-            new_balance = current_balance - withdraw_amount
-            withdraw_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
-            connection.commit()
-            print(f"Your withdrawal of ${withdraw_amount} was successful. The new balance is: ${new_balance}")
-            withdraw_cursor.close()
+            if withdraw_amount > current_balance:
+                print(f"\nSorry, you don't have ${withdraw_amount} in your account. You can only withdraw up to your current balance of ${current_balance}.\n")
+                valid_withdrawal = False
+            elif withdraw_amount == 0:
+                print(f"Please choose an amount greater than 0.")
+                valid_withdrawal = False
+            else: 
+                new_balance = current_balance - withdraw_amount
+                withdraw_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
+                connection.commit()
+                print(f"Your withdrawal of ${withdraw_amount:.2f} was successful. The new balance is: ${new_balance:.2f}")
+                withdraw_cursor.close()
+                valid_withdrawal = True
         elif withdraw_choice == 2:
             print("\nWithdrawal canceled.")
+            break
         else:
-            print("Invalid choice please choose either 1 or 2.")
+            print("\nInvalid Choice: please choose either 1 or 2.")
 
 def create_account(name, account_num, birth_day, pin_num, balance):
     print("\nWelcome! Create a new account by entering some basic information below:\n")
@@ -108,13 +125,13 @@ def create_account(name, account_num, birth_day, pin_num, balance):
     account_num = int(input("Account Number: "))
     birth_day = input("Date of Birth: ")
     pin_num = int(input("PIN: "))
-    balance = int(input("Balance: "))
+    balance = float(input("Balance: "))
     mycursor = connection.cursor()
     sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
-    print(f"\nNew user created. Welcome, {name.title()}.\nHere is your account information:\nAccount Number: {account_num}\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance}")
+    print(f"\nNew user created. Welcome, {name.title()}.\nHere is your account information:\nAccount Number: {account_num}\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance:.2f}")
 
-def delete_account(account_num, pin_num):
+def delete_account(account_num, pin_num, name):
     # delete account
     delete_cursor = connection.cursor()
     delete_choice = 0
@@ -123,9 +140,10 @@ def delete_account(account_num, pin_num):
         if delete_choice == 1:
             sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
             delete_cursor.execute(sql)
-            print(f"Account number: {account_num} deleted.")
+            print(f"Account number {account_num} deleted. Goodbye, {name.title()}.")
+            repeat_menu(menu_choice, name, balance, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
         else:
-            print("Canceled.")
+            print("\nCanceled.")
     
 def modify_account(account_num, pin_num):
     # allow edit access & ability to close account, edit name, change pin number, personal identification, etc.
@@ -135,7 +153,7 @@ def modify_account(account_num, pin_num):
     new_pin_num = int(input("Updated PIN: "))
     sql = f"UPDATE bank SET name = '{new_name}', pin = '{new_pin_num}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
     modify_cursor.execute(sql)
-    print(f"\nAccount number: {account_num} has been modified. Your updated name is {new_name.title()}, and your updated PIN is now {new_pin_num}.")
+    print(f"\nAccount number {account_num} has been modified. Your updated name is {new_name.title()}, and your new PIN is now {new_pin_num}.")
 
 def repeat_menu(menu_choice, name, balance, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num):
     menu_choice = 0
@@ -173,8 +191,7 @@ def bank_login(account_num, pin_num, menu_choice):
                     modify_account(account_num, pin_num)
                     login_choice = 0
                 elif login_choice == 6:
-                    delete_account(account_num, pin_num)
-                    repeat_menu(menu_choice, name, balance, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+                    delete_account(account_num, pin_num, name)
                     login_choice = 0
                 elif login_choice == 7:
                     create_account(name, account_num, birth_day, pin_num, balance)
