@@ -1,28 +1,5 @@
 # Testing
-import unittest
 import sys
-from unittest.mock import MagicMock
-import main
-
-# Test Check Balance
-class TestCheckBalance(unittest.TestCase):
-    def test_check_balance(self):
-        # Create a MagicMock for the cursor
-        cursor_mock = MagicMock()
-        cursor_mock.fetchone.return_value = (1000,)
-
-        # Set the cursor to the MagicMock
-        main.cnx.cursor.return_value = cursor_mock
-
-        # Call the function you want to test
-        result = main.check_balance('01234567')
-
-        # Assert that the cursor was called with the correct query
-        cursor_mock.execute.assert_called_once_with('SELECT balance FROM accounts WHERE account_number = %s', ('01234567',))
-
-        # Assert that the result is correct
-        self.assertEqual(result, 1000)
-
 import mysql.connector
 
 connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
@@ -36,21 +13,24 @@ pin_num = 0
 birth_day = 0
 withdraw_amount = None
 deposit_amount = None
-deposit_choice = 0
 withdraw_choice = 0
 account_num = 0
 
 def check_balance(account_num, pin_num):
-    balance_cursor = connection.cursor()
-    find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
-    balance_cursor.execute(find_balance)
-    result = balance_cursor.fetchone()
-    if result:
-        balance = result[0]
-        print(f"\nYour current balance is: ${balance:.2f}")
-    else:
-        print("Invalid account number or PIN.")
-    balance_cursor.close()
+    try: 
+        balance_cursor = connection.cursor()
+        find_balance = f"SELECT balance FROM bank WHERE accountnumber = '{account_num}' AND pin = '{pin_num}'"
+        balance_cursor.execute(find_balance)
+        result = balance_cursor.fetchone()
+        if result:
+            balance = result[0]
+            print(f"\nYour current balance is: ${balance:.2f}")
+        else:
+            print("Invalid account number or PIN.")
+    except mysql.connector.Error as error:
+        print(f"Error: {error}")
+    finally:
+        balance_cursor.close()
 
 def deposit(deposit_amount, account_num, pin_num):
     deposit_choice = 0
@@ -140,7 +120,7 @@ def delete_account(account_num, pin_num, name):
             sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
             delete_cursor.execute(sql)
             print(f"Account number {account_num} deleted. Goodbye, {name.title()}.")
-            repeat_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+            repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
         else:
             print("\nCanceled.")
     
@@ -154,9 +134,9 @@ def modify_account(account_num, pin_num):
     modify_cursor.execute(sql)
     print(f"\nAccount number {account_num} has been modified. Your updated name is {new_name.title()}, and your new PIN is now {new_pin_num}.")
 
-def repeat_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num):
+def repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num):
     menu_choice = 0
-    display_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+    display_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
 
 def bank_login(account_num, pin_num, menu_choice):
     log_in = False
@@ -176,7 +156,7 @@ def bank_login(account_num, pin_num, menu_choice):
                 login_choice = int(input("\n ~ Menu ~\n1) Return Home\n2) Check Account Balance\n3) Make A Deposit\n4) Make A Withdrawal\n5) Edit Account\n6) Close Your Account\n7) Create An Account\n8) Exit\n\nPlease choose an option (number 1-8): "))
                 if login_choice == 1:
                     login_cursor.close()
-                    repeat_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+                    repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
                 elif login_choice == 2:
                     check_balance(account_num, pin_num)
                     login_choice = 0
@@ -204,13 +184,13 @@ def bank_login(account_num, pin_num, menu_choice):
             print("\nERROR: You have entered an invalid account number or PIN. Please try again.\n")
             log_in = False
 
-def display_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num):
+def display_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num):
     while menu_choice < 1 or menu_choice > 3:
         menu_choice = int(input("\n  ~ Home Menu ~\n1) Create An Account\n2) Log In\n3) Exit\n\nPlease choose an option (number 1-3): "))
-        display_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+        display_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
         if menu_choice == 1:
             create_account(name, account_num, birth_day, pin_num)
-            repeat_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+            repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
         elif menu_choice == 2:
             bank_login(account_num, pin_num, menu_choice)
         elif menu_choice == 3:
@@ -227,6 +207,6 @@ print("""
 == == == == == == == == == == == == == == == == == == == == ==
 """)
 
-display_menu(menu_choice, name, deposit_amount, deposit_choice, withdraw_amount, withdraw_choice, account_num)
+display_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
 
 connection.close()
