@@ -1,6 +1,7 @@
 # Testing
 import sys
 import mysql.connector
+import time
 
 connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
 connection.autocommit = True
@@ -25,6 +26,7 @@ def check_balance(account_num, pin_num):
         if result:
             balance = result[0]
             print(f"\nYour current balance is: ${balance:.2f}")
+            time.sleep(1)
         else:
             print("Invalid account number or PIN.")
     except mysql.connector.Error as error:
@@ -52,6 +54,7 @@ def deposit(deposit_amount, account_num, pin_num):
                 deposit_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
                 connection.commit()
                 print(f"\nYour deposit of ${deposit_amount:.2f} was successful. The new balance is: ${new_balance:.2f}")
+                time.sleep(1)
                 deposit_cursor.close()
                 valid_deposit = True
             else: 
@@ -79,16 +82,17 @@ def withdraw(withdraw_amount, withdraw_choice, account_num, pin_num):
             withdraw_amount = float(input("\nHow much money would you like to withdraw from your account? "))
             current_balance = int(result[0])
             if withdraw_amount == 0:
-                print(f"Please choose an amount greater than $0.")
+                print(f"\nPlease choose an amount greater than $0.")
                 valid_withdrawal = False
             elif withdraw_amount > current_balance:
-                print(f"\nSorry, you don't have ${withdraw_amount} in your account. You can only withdraw up to your current balance of ${current_balance}.\n")
+                print(f"\nSorry, you don't have ${withdraw_amount:.2f} in your account. You can only withdraw up to your current balance of ${current_balance:.2f}.\n")
                 valid_withdrawal = False
             else: 
                 new_balance = current_balance - withdraw_amount
                 withdraw_cursor.execute(f"UPDATE bank SET balance = '{new_balance}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'")
                 connection.commit()
                 print(f"\nYour withdrawal of ${withdraw_amount:.2f} was successful. The new balance is: ${new_balance:.2f}")
+                time.sleep(1)
                 withdraw_cursor.close()
                 valid_withdrawal = True
         elif withdraw_choice == 2:
@@ -108,6 +112,7 @@ def create_account(name, account_num, birth_day, pin_num):
     sql = (f"INSERT INTO bank (name, accountnumber, pin, birthday, balance) VALUES ('{name}', '{account_num}', '{pin_num}', '{birth_day}', '{balance}')")
     mycursor.execute(sql)
     print(f"\nNew user created. Welcome, {name.title()}.\n\nHere is your account information:\nAccount Number: {account_num}\nPIN: {pin_num}\nBirthday: {birth_day}\nBalance: ${balance:.2f}")
+    time.sleep(1)
     mycursor.close()
 
 def delete_account(account_num, pin_num, name):
@@ -120,6 +125,7 @@ def delete_account(account_num, pin_num, name):
             sql = f"DELETE FROM bank WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
             delete_cursor.execute(sql)
             print(f"Account number {account_num} deleted. Goodbye, {name.title()}.")
+            time.sleep(1)
             repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num)
         else:
             print("\nCanceled.")
@@ -133,6 +139,7 @@ def modify_account(account_num, pin_num):
     sql = f"UPDATE bank SET name = '{new_name}', pin = '{new_pin_num}' WHERE accountnumber = '{account_num}' and pin = '{pin_num}'"
     modify_cursor.execute(sql)
     print(f"\nAccount number {account_num} has been modified. Your updated name is {new_name.title()}, and your new PIN is now {new_pin_num}.")
+    time.sleep(1)
 
 def repeat_menu(menu_choice, name, deposit_amount, withdraw_amount, withdraw_choice, account_num):
     menu_choice = 0
@@ -150,6 +157,7 @@ def bank_login(account_num, pin_num, menu_choice):
         if result:
             name = result[0]
             print(f"\nWelcome {name.title()}! You are now logged in :).")
+            time.sleep(1)
             log_in = True
             login_choice = 0
             while login_choice < 1 or login_choice > 8:
