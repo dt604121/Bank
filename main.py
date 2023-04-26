@@ -1,4 +1,4 @@
-# Testing
+# imports & connection
 import sys
 import mysql.connector
 import time
@@ -6,7 +6,7 @@ import time
 connection = mysql.connector.connect(user ='root', database = 'example', password = '12345')
 connection.autocommit = True
 
-# variables
+# starting variables
 balance = 0
 menu_choice = 0
 name = None
@@ -17,6 +17,7 @@ deposit_amount = None
 withdraw_choice = 0
 account_num = 0
 
+# functions
 def check_balance(account_num, pin_num):
     try: 
         balance_cursor = connection.cursor()
